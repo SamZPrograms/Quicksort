@@ -26,9 +26,14 @@ public class Quicksort {
     public static <AnyType extends Comparable<? super AnyType>> 
     void main(String[] args) {
         
-        int[] listSizes = {100}; //, 1000, 5000, 10000, 50000};
+        int[] listSizes = {10}; //, 1000, 5000, 10000, 50000};
         Random random = new Random();
         
+        
+//        Integer[] a = {7, 9, 8, 4, 3, 6, 10};
+//        for(int i = 0; i < a.length; i++) {
+//            System.out.print(a[i] + ", "); 
+//        }
         Integer[] a = new Integer[listSizes[0]];
         
         for(int i = 0; i < a.length; i++){
@@ -36,7 +41,10 @@ public class Quicksort {
             System.out.print(a[i] + ", ");
         }
         
-        quicksort3(a);
+        
+        
+        
+        quicksort1(a);
         
         System.out.println();
         
@@ -47,24 +55,20 @@ public class Quicksort {
     }
     
     public static <AnyType extends Comparable<? super AnyType>>
-    AnyType randomMedianElementPivot(AnyType []a, int rand1, int rand2, int rand3) {
+    AnyType randomMedianElementPivot(AnyType []a, int rand1, int rand3) {
         
-        System.out.println();
-        System.out.println(a[rand1]);
-        System.out.println(a[rand2]);
-        System.out.println(a[rand3]);
-        System.out.println();
-
-        if( a[ rand3 ].compareTo( a[ rand1 ] ) < 0 )
-            swapReferences( a, rand1, rand3 );
-        if( a[ rand2 ].compareTo( a[ rand1 ] ) < 0 )
-            swapReferences( a, rand1, rand2 );
-        if( a[ rand2 ].compareTo( a[ rand3 ] ) < 0 )
-            swapReferences( a, rand3, rand2 );
+        int rand2 = (rand1 + rand3) / 2;
+        
+        if(a[rand2].compareTo(a[rand1]) < 0)
+            swapReferences(a, rand1, rand2);
+        if(a[rand3].compareTo(a[rand1]) < 0)
+            swapReferences(a, rand1, rand3 );
+        if(a[rand3].compareTo(a[rand2]) < 0)
+            swapReferences(a, rand2, rand3);
 
         // Place pivot at position right - 1
-        swapReferences(a, rand3, rand2);
-        return a[rand2];
+        swapReferences(a, rand2, rand3);
+        return a[rand3];
     }
     
     /**
@@ -72,27 +76,20 @@ public class Quicksort {
      * Order these and hide the pivot.
      */
     public static <AnyType extends Comparable<? super AnyType>>
-    AnyType medianElementPivot( AnyType [ ] a, int left, int right )
+    AnyType medianElementPivot(AnyType []a, int left, int right)
     {
-        int center = ( left + right ) / 2;
+        int center = (left + right) / 2;
         
-        System.out.println();
-        System.out.println(a[left]);
-        System.out.println(a[center]);
-        System.out.println(a[right]);
-        System.out.println();
-        
-        
-        if( a[ center ].compareTo( a[ left ] ) < 0 )
-            swapReferences( a, left, center );
-        if( a[ right ].compareTo( a[ left ] ) < 0 )
-            swapReferences( a, left, right );
-        if( a[ right ].compareTo( a[ center ] ) < 0 )
-            swapReferences( a, center, right );
+        if(a[center].compareTo(a[left]) < 0)
+            swapReferences(a, left, center);
+        if(a[right].compareTo(a[left]) < 0)
+            swapReferences(a, left, right);
+        if(a[right].compareTo(a[center]) < 0)
+            swapReferences(a, center, right);
 
         // Place pivot at position right - 1
-        swapReferences( a, center, right - 1 );
-        return a[ right - 1 ];
+        swapReferences(a, center, right - 1);
+        return a[right - 1];
     }
     
     /**
@@ -103,33 +100,50 @@ public class Quicksort {
      * @param right the right-most index of the subarray.
      */
     public static <AnyType extends Comparable<? super AnyType>>
-    void quicksort1(AnyType[] a, int left, int right, AnyType first)
+    void quicksort1(AnyType[] a, int left, int right)
     {
         if( left + CUTOFF <= right )
         {
-            AnyType pivot = first;
+            AnyType pivot = a[left];
+            swapReferences(a, left, right);
             
-            System.out.println(pivot);
+            System.out.println();
+            
+            for(int k = 0; k < a.length; k++)
+                System.out.print(a[k] + ", ");
+            
+            System.out.println();
+            
             
             // Begin partitioning
-            int i = left, j = right - 1;
+            int i = left - 1, j = right;
             for( ; ; )
             {
-                while( a[ ++i ].compareTo( pivot ) < 0 && right > i ) { }
-                while( a[ --j ].compareTo( pivot ) > 0 && left < j) { }
-                if( i < j )
-                    swapReferences( a, i, j );
+                while((a[++i].compareTo(pivot) < 0) && right > i) { }
+                while((a[--j].compareTo(pivot) > 0) && left < j) { }
+                if(i < j) {
+                    System.out.println("pivot: " + pivot);
+                    System.out.println("i-j: " + i +"-" + j);
+                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
+                    swapReferences(a, i, j);
+                    System.out.println("i-j: " + i +"-" + j);
+                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
+                    System.out.println("\n");
+                    for(int k = 0; k < a.length; k++)
+                        System.out.print(a[k] + ", ");
+                    System.out.println();
+                }
                 else
                     break;
             }
 
-            swapReferences( a, i, right - 1 );   // Restore pivot
+            swapReferences(a, i, right);   // Restore pivot
 
-            quicksort1( a, left, i - 1, first);    // Sort small elements
-            quicksort1( a, i + 1, right, first);   // Sort large elements
+            quicksort1(a, left, i - 1);    // Sort small elements
+            quicksort1(a, i + 1, right);   // Sort large elements
         }
         else  // Do an insertion sort on the subarray
-            insertionSort( a, left, right );
+            insertionSort(a, left, right);
     }
     
     /**
@@ -140,28 +154,42 @@ public class Quicksort {
      * @param right the right-most index of the subarray.
      */
     public static <AnyType extends Comparable<? super AnyType>>
-    void quicksort2(AnyType[] a, int left, int right, AnyType rand)
+    void quicksort2(AnyType[] a, int left, int right)
     {
         if(left + CUTOFF <= right)
         {
-            AnyType pivot = rand;
-
+            Random random = new Random();
+            int rand = random.nextInt(a.length);
+            AnyType pivot = a[rand];
+            
+            swapReferences(a, rand, right);
+            
             // Begin partitioning
-            int i = left, j = right - 1;
+            int i = left - 1, j = right;
             for( ; ; )
             {
                 while( a[ ++i ].compareTo( pivot ) < 0 && right > i ) { }
                 while( a[ --j ].compareTo( pivot ) > 0 && left < j) { }
-                if( i < j )
-                    swapReferences( a, i, j );
+                if( i < j ) {
+                    System.out.println("pivot: " + pivot);
+                    System.out.println("i-j: " + i +"-" + j);
+                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
+                    swapReferences(a, i, j);
+                    System.out.println("i-j: " + i +"-" + j);
+                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
+                    System.out.println("\n");
+                    for(int k = 0; k < a.length; k++)
+                        System.out.print(a[k] + ", ");
+                    System.out.println();
+                }
                 else
                     break;
             }
 
-            swapReferences( a, i, right - 1 );   // Restore pivot
+            swapReferences(a, i, right);   // Restore pivot
 
-            quicksort2( a, left, i - 1, rand);    // Sort small elements
-            quicksort2( a, i + 1, right, rand);   // Sort large elements
+            quicksort2( a, left, i - 1);    // Sort small elements
+            quicksort2( a, i + 1, right);   // Sort large elements
         }
         else  // Do an insertion sort on the subarray
             insertionSort(a, left, right);
@@ -177,20 +205,40 @@ public class Quicksort {
     public static <AnyType extends Comparable<? super AnyType>>
     void quicksort3(AnyType[] a, int left, int right)
     {
-        if( left + CUTOFF <= right )
+        if(left + CUTOFF <= right )
         {
             Random random = new Random();
             
-//            System.out.println(rand1);
-//            System.out.println(rand2);
-//            System.out.println(rand3);
-//            System.out.println();
+            int rand1 = random.nextInt(a.length);
+            int rand2 = random.nextInt(a.length);
+            int rand3 = random.nextInt(a.length);
             
-            AnyType pivot = randomMedianElementPivot(a, random.nextInt(a.length), 
-                                                        random.nextInt(a.length), 
-                                                        random.nextInt(a.length));
+            if(a[rand2].compareTo(a[rand1]) < 0)
+                swapReferences(a, left, rand2);
+            if(a[rand3].compareTo(a[rand1]) < 0)
+                swapReferences(a, left, rand3);
+            if(a[rand3].compareTo(a[rand2]) < 0)
+                swapReferences(a, rand2, right);
+            
+            // Place pivot at position right - 1
+            swapReferences(a, rand2, right - 1);
+             
+            
+//            if(a[center].compareTo(a[left]) < 0)
+//                swapReferences(a, left, center);
+//            if(a[right].compareTo(a[left]) < 0)
+//                swapReferences(a, left, right);
+//            if(a[right].compareTo(a[center]) < 0)
+//                swapReferences(a, center, right);
+//
+//            // Place pivot at position right - 1
+//            swapReferences(a, center, right - 1);
+//            return a[right - 1];
+//            
+            AnyType pivot = a[right - 1];
+
+            System.out.println("pivot: " + pivot);
             System.out.println();
-            System.out.println(pivot);
             System.out.println();
             
             // Begin partitioning
@@ -199,13 +247,24 @@ public class Quicksort {
             {
                 while( a[ ++i ].compareTo( pivot ) < 0 && right > i ) { }
                 while( a[ --j ].compareTo( pivot ) > 0 && left < j) { }
-                if( i < j )
+                if( i < j ) {
+                    System.out.println("pivot: " + pivot);
+                    System.out.println("i-j: " + i +"-" + j);
+                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
                     swapReferences( a, i, j );
+                    System.out.println("i-j: " + i +"-" + j);
+                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
+                    System.out.println("\n");
+                    for(int k = 0; k < a.length; k++)
+                        System.out.print(a[k] + ", ");
+                    System.out.println();
+                }
+                    
                 else
                     break;
             }
 
-            swapReferences( a, i, right);   // Restore pivot
+            swapReferences(a, i, right - 1);   // Restore pivot
 
             quicksort3(a, left, i - 1);    // Sort small elements
             quicksort3(a, i + 1, right);   // Sort large elements
@@ -236,32 +295,42 @@ public class Quicksort {
             {
                 while( a[ ++i ].compareTo( pivot ) < 0 && right > i ) { }
                 while( a[ --j ].compareTo( pivot ) > 0 && left < j) { }
-                if( i < j )
+                if(i < j){
+                    System.out.println("pivot: " + pivot);
+                    System.out.println("i-j: " + i +"-" + j);
+                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
                     swapReferences( a, i, j );
+                    System.out.println("i-j: " + i +"-" + j);
+                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
+                    System.out.println("\n");
+                    for(int k = 0; k < a.length; k++)
+                        System.out.print(a[k] + ", ");
+                    System.out.println();
+                }
                 else
                     break;
             }
 
-            swapReferences( a, i, right - 1 );   // Restore pivot
+            swapReferences(a, i, right - 1);   // Restore pivot
 
-            quicksort4( a, left, i - 1);    // Sort small elements
-            quicksort4( a, i + 1, right);   // Sort large elements
+            quicksort4(a, left, i - 1);    // Sort small elements
+            quicksort4(a, i + 1, right);   // Sort large elements
         }
         else  // Do an insertion sort on the subarray
-            insertionSort( a, left, right );
+            insertionSort(a, left, right);
     }
     
     public static <AnyType extends Comparable<? super AnyType>>
     void quicksort1(AnyType[] a)
     {
-        quicksort1(a, 0, a.length - 1, a[0]);
+        quicksort1(a, 0, a.length - 1);
     }
     
     public static <AnyType extends Comparable<? super AnyType>>
     void quicksort2(AnyType[] a)
     {
         Random random = new Random();
-        quicksort2(a, 0, a.length - 1, a[random.nextInt(a.length)]);
+        quicksort2(a, 0, a.length - 1);
     }
     
     public static <AnyType extends Comparable<? super AnyType>>
