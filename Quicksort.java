@@ -5,8 +5,13 @@
  */
 package quicksort;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner; 
 
 /**
  *
@@ -24,51 +29,128 @@ public class Quicksort {
      * @param args the command line arguments
      */
     public static <AnyType extends Comparable<? super AnyType>> 
-    void main(String[] args) {
-        
-        int[] listSizes = {10}; //, 1000, 5000, 10000, 50000};
+    void main(String[] args) throws IOException {
+    
+        Scanner scan = new Scanner(System.in);
         Random random = new Random();
+        BufferedWriter unsortedOutput = null;
+        BufferedWriter sortedOutput = null;
+       
+        
+        System.out.println("Enter a number to create and sort an array of that size: ");
+        
+        int size = scan.nextInt();
+        scan.close();
+        
+        Integer[] firstElement = new Integer[size];
+        Integer[] randomElement = new Integer[size];
+        Integer[] randomMedianElementOfThree = new Integer[size];
+        Integer[] medianElementOfThree = new Integer[size];
+        
+        try {
+            File file = new File("unsorted.txt");
+            unsortedOutput = new BufferedWriter(new FileWriter(file));
+            
+            unsortedOutput.write("Unsorted array:\n");
+            
+            int rand = 0;
+            String number;
+            for(int i = 0; i < firstElement.length; i++){
+                rand = random.nextInt(size);
+                number = String.valueOf(rand);
+                firstElement[i] = rand;
+                randomElement[i] = rand;
+                randomMedianElementOfThree[i] = rand;
+                medianElementOfThree[i] = rand;
+
+                unsortedOutput.write(number);
+                if(i != firstElement.length - 1)
+                    unsortedOutput.write(", ");
+            }
+        } catch ( IOException e ) {
+            System.out.println("Could not open 'unsorted' file correctly");
+        } 
+        
+        long start = System.currentTimeMillis();        
+        quicksort1(firstElement);
+        long firstElementTime = System.currentTimeMillis() - start;
+        
+        start = System.currentTimeMillis();
+        quicksort2(randomElement);
+        long randomElementTime = System.currentTimeMillis() - start;
+        
+        start = System.currentTimeMillis();
+        quicksort3(randomMedianElementOfThree);
+        long randomMedianElementOfThreeTime = System.currentTimeMillis() - start;
+        
+        start = System.currentTimeMillis();
+        quicksort4(medianElementOfThree);
+        long medianElementOfThreeTime = System.currentTimeMillis() - start;
+        
+        try {
+            File file = new File("sorted.txt");
+            sortedOutput = new BufferedWriter(new FileWriter(file));
+            
+            
+            String number;
+            sortedOutput.write("Quicksort by first pivot:\n");
+            for(int i = 0; i < firstElement.length; i++) {
+                number = String.valueOf(firstElement[i]);
+                sortedOutput.write(number);
+                if(i != firstElement.length - 1)
+                    sortedOutput.write(", ");
+            }
+            sortedOutput.write("\nFirst pivot time in milliseconds: " + firstElementTime + "\n\n");
+            
+            sortedOutput.write("Quicksort by random pivot:\n");
+            for(int i = 0; i < randomElement.length; i++) {
+                number = String.valueOf(randomElement[i]);
+                sortedOutput.write(number);
+                if(i != randomElement.length - 1)
+                    sortedOutput.write(", ");
+            }
+            sortedOutput.write("\nRandom pivot time in milliseconds: " + randomElementTime + "\n\n");
+            
+            sortedOutput.write("Quicksort by median of 3 random pivots:\n");
+            for(int i = 0; i < randomMedianElementOfThree.length; i++) {
+                number = String.valueOf(randomMedianElementOfThree[i]);
+                sortedOutput.write(number);
+                if(i != randomMedianElementOfThree.length - 1)
+                    sortedOutput.write(", ");
+            }
+            sortedOutput.write("\nMedian of 3 random pivots time in milliseconds: " + randomMedianElementOfThreeTime + "\n\n");
+            
+            sortedOutput.write("Quicksort by median of left-center-right pivot:\n");
+            for(int i = 0; i < medianElementOfThree.length; i++) {
+                number = String.valueOf(medianElementOfThree[i]);
+                sortedOutput.write(number);
+                if(i != medianElementOfThree.length - 1)
+                    sortedOutput.write(", ");
+            }
+            sortedOutput.write("\nMedian of left-center-right pivot time in milliseconds: " + medianElementOfThreeTime + "\n\n");
+            
+        } catch ( IOException e ) {
+            System.out.println("Could not open 'sorted' file correctly");
+        } 
         
         
-//        Integer[] a = {7, 9, 8, 4, 3, 6, 10};
-//        for(int i = 0; i < a.length; i++) {
-//            System.out.print(a[i] + ", "); 
-//        }
-        Integer[] a = new Integer[listSizes[0]];
-        
-        for(int i = 0; i < a.length; i++){
-            a[i] = random.nextInt(100);
-            System.out.print(a[i] + ", ");
-        }
-        
-        
-        
-        
-        quicksort1(a);
-        
-        System.out.println();
-        
-        for(int i = 0; i < a.length; i++){
-            System.out.print(a[i] + ", ");
-        }
-        
+        sortedOutput.close();
+        unsortedOutput.close();
     }
     
     public static <AnyType extends Comparable<? super AnyType>>
-    AnyType randomMedianElementPivot(AnyType []a, int rand1, int rand3) {
-        
-        int rand2 = (rand1 + rand3) / 2;
-        
+    AnyType randomMedianElementPivot(AnyType []a, int right, int left, int rand1, int rand2, int rand3) {
+
         if(a[rand2].compareTo(a[rand1]) < 0)
             swapReferences(a, rand1, rand2);
         if(a[rand3].compareTo(a[rand1]) < 0)
-            swapReferences(a, rand1, rand3 );
+            swapReferences(a, rand1, rand3);
         if(a[rand3].compareTo(a[rand2]) < 0)
             swapReferences(a, rand2, rand3);
 
         // Place pivot at position right - 1
-        swapReferences(a, rand2, rand3);
-        return a[rand3];
+        swapReferences(a, rand2, right);
+        return a[right];
     }
     
     /**
@@ -78,6 +160,7 @@ public class Quicksort {
     public static <AnyType extends Comparable<? super AnyType>>
     AnyType medianElementPivot(AnyType []a, int left, int right)
     {
+        
         int center = (left + right) / 2;
         
         if(a[center].compareTo(a[left]) < 0)
@@ -107,32 +190,14 @@ public class Quicksort {
             AnyType pivot = a[left];
             swapReferences(a, left, right);
             
-            System.out.println();
-            
-            for(int k = 0; k < a.length; k++)
-                System.out.print(a[k] + ", ");
-            
-            System.out.println();
-            
-            
             // Begin partitioning
             int i = left - 1, j = right;
             for( ; ; )
             {
                 while((a[++i].compareTo(pivot) < 0) && right > i) { }
                 while((a[--j].compareTo(pivot) > 0) && left < j) { }
-                if(i < j) {
-                    System.out.println("pivot: " + pivot);
-                    System.out.println("i-j: " + i +"-" + j);
-                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
+                if(i < j)
                     swapReferences(a, i, j);
-                    System.out.println("i-j: " + i +"-" + j);
-                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
-                    System.out.println("\n");
-                    for(int k = 0; k < a.length; k++)
-                        System.out.print(a[k] + ", ");
-                    System.out.println();
-                }
                 else
                     break;
             }
@@ -159,37 +224,29 @@ public class Quicksort {
         if(left + CUTOFF <= right)
         {
             Random random = new Random();
-            int rand = random.nextInt(a.length);
+            int rand = random.nextInt(right - left) + left;
+            
             AnyType pivot = a[rand];
             
-            swapReferences(a, rand, right);
+            if(rand != right)
+                swapReferences(a, rand, right);
             
             // Begin partitioning
             int i = left - 1, j = right;
             for( ; ; )
             {
-                while( a[ ++i ].compareTo( pivot ) < 0 && right > i ) { }
-                while( a[ --j ].compareTo( pivot ) > 0 && left < j) { }
-                if( i < j ) {
-                    System.out.println("pivot: " + pivot);
-                    System.out.println("i-j: " + i +"-" + j);
-                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
+                while(a[++i].compareTo(pivot) < 0 && right > i) { }
+                while(a[--j].compareTo(pivot) > 0 && left < j) { }
+                if(i < j) 
                     swapReferences(a, i, j);
-                    System.out.println("i-j: " + i +"-" + j);
-                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
-                    System.out.println("\n");
-                    for(int k = 0; k < a.length; k++)
-                        System.out.print(a[k] + ", ");
-                    System.out.println();
-                }
                 else
                     break;
             }
 
             swapReferences(a, i, right);   // Restore pivot
 
-            quicksort2( a, left, i - 1);    // Sort small elements
-            quicksort2( a, i + 1, right);   // Sort large elements
+            quicksort2(a, left, i - 1);    // Sort small elements
+            quicksort2(a, i + 1, right);   // Sort large elements
         }
         else  // Do an insertion sort on the subarray
             insertionSort(a, left, right);
@@ -209,68 +266,31 @@ public class Quicksort {
         {
             Random random = new Random();
             
-            int rand1 = random.nextInt(a.length);
-            int rand2 = random.nextInt(a.length);
-            int rand3 = random.nextInt(a.length);
-            
-            if(a[rand2].compareTo(a[rand1]) < 0)
-                swapReferences(a, left, rand2);
-            if(a[rand3].compareTo(a[rand1]) < 0)
-                swapReferences(a, left, rand3);
-            if(a[rand3].compareTo(a[rand2]) < 0)
-                swapReferences(a, rand2, right);
-            
-            // Place pivot at position right - 1
-            swapReferences(a, rand2, right - 1);
-             
-            
-//            if(a[center].compareTo(a[left]) < 0)
-//                swapReferences(a, left, center);
-//            if(a[right].compareTo(a[left]) < 0)
-//                swapReferences(a, left, right);
-//            if(a[right].compareTo(a[center]) < 0)
-//                swapReferences(a, center, right);
-//
-//            // Place pivot at position right - 1
-//            swapReferences(a, center, right - 1);
-//            return a[right - 1];
-//            
-            AnyType pivot = a[right - 1];
+            int rand1 = random.nextInt(right - left) + left;
+            int rand2 = random.nextInt(right - left) + left;
+            int rand3 = random.nextInt(right - left) + left;
+                        
+            AnyType pivot = randomMedianElementPivot(a, right, left, rand1, rand2, rand3);
 
-            System.out.println("pivot: " + pivot);
-            System.out.println();
-            System.out.println();
-            
             // Begin partitioning
-            int i = left, j = right - 1;
+            int i = left - 1, j = right;
             for( ; ; )
             {
-                while( a[ ++i ].compareTo( pivot ) < 0 && right > i ) { }
-                while( a[ --j ].compareTo( pivot ) > 0 && left < j) { }
-                if( i < j ) {
-                    System.out.println("pivot: " + pivot);
-                    System.out.println("i-j: " + i +"-" + j);
-                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
+                while(a[++i].compareTo(pivot) < 0 && right > i) { }
+                while(a[--j].compareTo(pivot) > 0 && left < j) { }
+                if( i < j )
                     swapReferences( a, i, j );
-                    System.out.println("i-j: " + i +"-" + j);
-                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
-                    System.out.println("\n");
-                    for(int k = 0; k < a.length; k++)
-                        System.out.print(a[k] + ", ");
-                    System.out.println();
-                }
-                    
                 else
                     break;
             }
 
-            swapReferences(a, i, right - 1);   // Restore pivot
+            swapReferences(a, i, right);   // Restore pivot
 
             quicksort3(a, left, i - 1);    // Sort small elements
             quicksort3(a, i + 1, right);   // Sort large elements
         }
         else  // Do an insertion sort on the subarray
-            insertionSort( a, left, right );
+            insertionSort(a, left, right);
     }
     
     /**
@@ -287,26 +307,14 @@ public class Quicksort {
         {
             AnyType pivot = medianElementPivot(a, left, right);
             
-            System.out.println(pivot);
-
             // Begin partitioning
             int i = left, j = right - 1;
             for( ; ; )
             {
                 while( a[ ++i ].compareTo( pivot ) < 0 && right > i ) { }
                 while( a[ --j ].compareTo( pivot ) > 0 && left < j) { }
-                if(i < j){
-                    System.out.println("pivot: " + pivot);
-                    System.out.println("i-j: " + i +"-" + j);
-                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
+                if(i < j)
                     swapReferences( a, i, j );
-                    System.out.println("i-j: " + i +"-" + j);
-                    System.out.println("a[i]-a[j]: " + a[i] +"-" + a[j]);
-                    System.out.println("\n");
-                    for(int k = 0; k < a.length; k++)
-                        System.out.print(a[k] + ", ");
-                    System.out.println();
-                }
                 else
                     break;
             }
