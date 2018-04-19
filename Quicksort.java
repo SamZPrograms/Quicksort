@@ -15,14 +15,12 @@ import java.util.Scanner;
 
 /**
  *
- * @author Archi
+ * @author Samuel Zrna
  */
 public class Quicksort {
-    
-    
-    public static final int CUTOFF = 3;
-    public static final int COUNT = 10;
-    private static final int NUM_ITEMS = 1000;
+
+    // global cutoff variable
+    private static final int CUTOFF = 3;
     
     /**
      * Quicksort algorithm.
@@ -31,67 +29,101 @@ public class Quicksort {
     public static <AnyType extends Comparable<? super AnyType>> 
     void main(String[] args) throws IOException {
     
-        Scanner scan = new Scanner(System.in);
-        Random random = new Random();
-        BufferedWriter unsortedOutput = null;
-        BufferedWriter sortedOutput = null;
+        Scanner scan = new Scanner(System.in);  // input scanner to read user input
+        Random random = new Random();           // random obj to generate random integers
+        BufferedWriter unsortedOutput = null;   // unsorted buffered writer
+        BufferedWriter sortedOutput = null;     // sorted buffered writer
        
-        
+        // promt the user
         System.out.println("Enter a number to create and sort an array of that size: ");
+        int size = scan.nextInt();  // store user input into int size
+        scan.close();               // close scanner
         
-        int size = scan.nextInt();
-        scan.close();
-        
+        // initialization of 4 arrays with size of size 
         Integer[] firstElement = new Integer[size];
         Integer[] randomElement = new Integer[size];
         Integer[] randomMedianElementOfThree = new Integer[size];
         Integer[] medianElementOfThree = new Integer[size];
         
+        // try-catch block to safely create and write to file
         try {
-            File file = new File("unsorted.txt");
-            unsortedOutput = new BufferedWriter(new FileWriter(file));
+            // unsortedOutput now can be used to write to "unsorted.txt"
+            unsortedOutput = new BufferedWriter(new FileWriter(new File("unsorted.txt")));
             
             unsortedOutput.write("Unsorted array:\n");
             
+            // initializing variables used in the loop
             int rand = 0;
             String number;
+            
+            // for-loop to load each array with the same random numbers
             for(int i = 0; i < firstElement.length; i++){
-                rand = random.nextInt(size);
-                number = String.valueOf(rand);
+                rand = random.nextInt(size);                // gets rand int b/t 0 and size - 1
+                number = String.valueOf(rand);              // number is the rand but of type String
                 firstElement[i] = rand;
                 randomElement[i] = rand;
                 randomMedianElementOfThree[i] = rand;
                 medianElementOfThree[i] = rand;
 
-                unsortedOutput.write(number);
-                if(i != firstElement.length - 1)
+                unsortedOutput.write(number);               // writes the number to unsorted
+                if(i != firstElement.length - 1)            // if last pass, don't write ", "
                     unsortedOutput.write(", ");
             }
         } catch ( IOException e ) {
             System.out.println("Could not open 'unsorted' file correctly");
         } 
         
+        /*
+            quicksort1
+            Here we call the first quicksort method which uses the first element
+            as the pivot.
+            I also keep track of how long it takes using System.currentTimeMillis().
+        */
         long start = System.currentTimeMillis();        
         quicksort1(firstElement);
         long firstElementTime = System.currentTimeMillis() - start;
+        System.out.println("First pivot time in milliseconds: " + firstElementTime + "\n");
         
+        /*
+            quicksort2
+            Here we call the second quicksort which uses a random element
+            as the pivot.
+            I also keep track of how long it takes using System.currentTimeMillis().
+        */
         start = System.currentTimeMillis();
         quicksort2(randomElement);
         long randomElementTime = System.currentTimeMillis() - start;
+        System.out.println("Random pivot time in milliseconds: " + randomElementTime + "\n");
         
+        /*
+            quicksort3
+            Here we call the third quicksort method which uses the median of
+            three randomly selected elements as the pivot.
+            I also keep track of how long it takes using System.currentTimeMillis().
+        */
         start = System.currentTimeMillis();
         quicksort3(randomMedianElementOfThree);
         long randomMedianElementOfThreeTime = System.currentTimeMillis() - start;
+        System.out.println("Median of 3 random pivots time in milliseconds: " + randomMedianElementOfThreeTime + "\n");
         
+        /*
+            quicksort4
+            Here we call the fourth quicksort method which uses the median of
+            the first, middle and last element as the pivot.
+            I also keep track of how long it takes using System.currentTimeMillis().
+        */
         start = System.currentTimeMillis();
         quicksort4(medianElementOfThree);
         long medianElementOfThreeTime = System.currentTimeMillis() - start;
+        System.out.println("Median of left-center-right pivot time in milliseconds: " + medianElementOfThreeTime + "\n");
         
+        // try-catch block to safely create and write to file
         try {
-            File file = new File("sorted.txt");
-            sortedOutput = new BufferedWriter(new FileWriter(file));
+            // sortedOutput now can be used to write to "sorted.txt"
+            sortedOutput = new BufferedWriter(new FileWriter(new File("sorted.txt")));
             
-            
+            // first pivot
+            // loops through sorted array and writes it to sorted.txt
             String number;
             sortedOutput.write("Quicksort by first pivot:\n");
             for(int i = 0; i < firstElement.length; i++) {
@@ -102,6 +134,8 @@ public class Quicksort {
             }
             sortedOutput.write("\nFirst pivot time in milliseconds: " + firstElementTime + "\n\n");
             
+            // random pivot
+            // loops through sorted array and writes it to sorted.txt
             sortedOutput.write("Quicksort by random pivot:\n");
             for(int i = 0; i < randomElement.length; i++) {
                 number = String.valueOf(randomElement[i]);
@@ -111,6 +145,8 @@ public class Quicksort {
             }
             sortedOutput.write("\nRandom pivot time in milliseconds: " + randomElementTime + "\n\n");
             
+            // median of 3 random elements as the pivot
+            // loops through sorted array and writes it to sorted.txt
             sortedOutput.write("Quicksort by median of 3 random pivots:\n");
             for(int i = 0; i < randomMedianElementOfThree.length; i++) {
                 number = String.valueOf(randomMedianElementOfThree[i]);
@@ -120,6 +156,8 @@ public class Quicksort {
             }
             sortedOutput.write("\nMedian of 3 random pivots time in milliseconds: " + randomMedianElementOfThreeTime + "\n\n");
             
+            // median of first, middle and last elements as the pivot
+            // loops through sorted array and writes it to sorted.txt
             sortedOutput.write("Quicksort by median of left-center-right pivot:\n");
             for(int i = 0; i < medianElementOfThree.length; i++) {
                 number = String.valueOf(medianElementOfThree[i]);
@@ -133,13 +171,21 @@ public class Quicksort {
             System.out.println("Could not open 'sorted' file correctly");
         } 
         
-        
+        // close buffered writters
         sortedOutput.close();
         unsortedOutput.close();
     }
     
+    /**
+     * Internal quicksort method finds the median of 3 random elements.     
+     * @param a an array of Comparable items.
+     * @param right the right-most index of the subarray.
+     * @param rand1 a random index between left and right
+     * @param rand2 a random index between left and right
+     * @param rand3 a random index between left and right
+     */
     public static <AnyType extends Comparable<? super AnyType>>
-    AnyType randomMedianElementPivot(AnyType []a, int right, int left, int rand1, int rand2, int rand3) {
+    AnyType randomMedianElementPivot(AnyType []a, int right, int rand1, int rand2, int rand3) {
 
         if(a[rand2].compareTo(a[rand1]) < 0)
             swapReferences(a, rand1, rand2);
@@ -148,7 +194,7 @@ public class Quicksort {
         if(a[rand3].compareTo(a[rand2]) < 0)
             swapReferences(a, rand2, rand3);
 
-        // Place pivot at position right - 1
+        // Place pivot at position right
         swapReferences(a, rand2, right);
         return a[right];
     }
@@ -177,7 +223,7 @@ public class Quicksort {
     
     /**
      * Internal quicksort method that makes recursive calls.
-     * Uses median-of-three partitioning and a cutoff of 10.
+     * Uses first element to do the  partitioning and a cutoff of 3.
      * @param a an array of Comparable items.
      * @param left the left-most index of the subarray.
      * @param right the right-most index of the subarray.
@@ -213,7 +259,7 @@ public class Quicksort {
     
     /**
      * Internal quicksort method that makes recursive calls.
-     * Uses median-of-three partitioning and a cutoff of 10.
+     * Uses a random element to do the partitioning and a cutoff of 3.
      * @param a an array of Comparable items.
      * @param left the left-most index of the subarray.
      * @param right the right-most index of the subarray.
@@ -254,7 +300,8 @@ public class Quicksort {
     
     /**
      * Internal quicksort method that makes recursive calls.
-     * Uses median-of-three partitioning and a cutoff of 10.
+     * Uses median-of-three of randomly selected elements for the partitioning 
+     * and a cutoff of 3.
      * @param a an array of Comparable items.
      * @param left the left-most index of the subarray.
      * @param right the right-most index of the subarray.
@@ -270,7 +317,7 @@ public class Quicksort {
             int rand2 = random.nextInt(right - left) + left;
             int rand3 = random.nextInt(right - left) + left;
                         
-            AnyType pivot = randomMedianElementPivot(a, right, left, rand1, rand2, rand3);
+            AnyType pivot = randomMedianElementPivot(a, right, rand1, rand2, rand3);
 
             // Begin partitioning
             int i = left - 1, j = right;
@@ -328,12 +375,20 @@ public class Quicksort {
             insertionSort(a, left, right);
     }
     
+    /**
+     * Internal quicksort method that calls the overloaded quicksort call.
+     * @param a an array of Comparable items.
+     */
     public static <AnyType extends Comparable<? super AnyType>>
     void quicksort1(AnyType[] a)
     {
         quicksort1(a, 0, a.length - 1);
     }
     
+    /**
+     * Internal quicksort method that calls the overloaded quicksort call.
+     * @param a an array of Comparable items.
+     */
     public static <AnyType extends Comparable<? super AnyType>>
     void quicksort2(AnyType[] a)
     {
@@ -341,18 +396,26 @@ public class Quicksort {
         quicksort2(a, 0, a.length - 1);
     }
     
+    /**
+     * Internal quicksort method that calls the overloaded quicksort call.
+     * @param a an array of Comparable items.
+     */
     public static <AnyType extends Comparable<? super AnyType>>
     void quicksort3(AnyType[] a)
     {
         quicksort3(a, 0, a.length - 1);
     }
     
+    /**
+     * Internal quicksort method that calls the overloaded quicksort call.
+     * @param a an array of Comparable items.
+     */
     public static <AnyType extends Comparable<? super AnyType>>
     void quicksort4(AnyType[] a)
     {
         quicksort4( a, 0, a.length - 1);
     }
-        
+       
     public static <AnyType extends Comparable<? super AnyType>>
     void insertionSort( AnyType [ ] a, int left, int right )
     {
@@ -379,5 +442,4 @@ public class Quicksort {
         a[ index1 ] = a[ index2 ];
         a[ index2 ] = tmp;
     }
-    
 }
